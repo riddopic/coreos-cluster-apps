@@ -1,0 +1,54 @@
+#! /bin/bash -e
+
+FLEETCTL_ENDPOINT=http://etcd.cluster.local:4001
+role=''
+cikey="/var/lib/apps-data/jenkins/.ssh/jenkins_ida_rsa"
+sshopt="-o StrictHostKeyChecking=no  -o BatchMode=yes"
+# If this is ci machine, use jenkin's key
+if [ -f $cikey ];
+then
+    sshkey="-i $cikey"
+    role='site'
+else
+    sshkey=''
+fi
+case "$1" in
+  -r|--role)
+    shift
+    role=$1
+    shift
+    ;;
+  -h|--help)
+    echo -e "Run cmd on all nodes of this cluster.\nUsage: $0 cmd"
+    exit 0
+    ;;
+esac
+
+if [ $# -lt 1 ]; then
+  echo "Usage: $0 cmd"
+  exit 1
+fi
+ 
+tmpdir=${TMPDIR:-/tmp}/clusterdo.$$
+mkdir -p $tmpdir
+count=0
+nodes=$( fleetctl --endpoint=http://etcd.cluster.local:4001 list-machines  --no-legend | awk "/role=$(echo ${role} |sed s/,/\|/g)/ {print \$2}")
+for node in $nodes; do
+    # If on CI, we  need to use sudo so we can read jenkins key
+    if [ "X$sshkey" = "X" ];
+    then
+        ssh $sshkey $sshopt core@${node} $* > ${tmpdir}/${node} 2>&1 &
+    else
+        sudo ssh $sshkey $sshopt core@${node} $* > ${tmpdir}/${node} 2>&1 &
+    fi
+    count=`expr $count + 1`
+done
+
+while [ $count -gt 0 ]; do
+	set +e
+    wait $pids
+    count=`expr $count - 1`
+done
+
+cat $tmpdir/*
+echo "Output for hosts are in $tmpdir"
