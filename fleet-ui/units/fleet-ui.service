@@ -16,5 +16,5 @@ RestartSec=15
 Restart=always
 
 [X-Fleet]
-X-Conflicts=dockerhub.service
+X-Conflicts=registry.service
 MachineMetadata=role=admiral

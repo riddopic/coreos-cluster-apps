@@ -1,11 +1,11 @@
 [Unit]
 Description=nginx
-Wants=dockerhub.service
-After=dockerhub.service
+Wants=registry.service
+After=registry.service
 
 [Service]
 EnvironmentFile=/etc/environment
-EnvironmentFile=/var/lib/apps/dockerhub-proxy/envvars
+EnvironmentFile=/var/lib/apps/registry-proxy/envvars
 TimeoutStartSec=0
 ExecStartPre=/var/lib/apps/bin/dkpull ${DOCKER_IMAGE}
 ExecStartPre=-/usr/bin/docker rm %n
@@ -18,5 +18,5 @@ RestartSec=5
 Restart=always
 
 [X-Fleet]
-MachineMetadata=role=dockerhub
+MachineMetadata=role=registry
 Global=true

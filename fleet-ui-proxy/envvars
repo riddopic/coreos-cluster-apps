@@ -3,7 +3,7 @@
 # .dockercfg file under $HOME
 HOME=/home/core
 
-DOCKER_IMAGE=dockerhub.stanford.edu/core/apache-mellon
+DOCKER_IMAGE=registry.stanford.edu/core/apache-mellon
 DOCKER_OPTS="-p 8083:8080 \
     --link fleet-ui.service:fleet-ui.service \
     -v /var/lib/apps/fleet-ui-proxy/auth_mellon:/etc/auth_mellon \

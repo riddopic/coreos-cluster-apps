@@ -6,7 +6,7 @@ After=docker.service
 [Service]
 EnvironmentFile=/etc/environment
 EnvironmentFile=/etc/aws/account.envvars
-EnvironmentFile=/var/lib/apps/dockerhub/envvars
+EnvironmentFile=/var/lib/apps/registry/envvars
 TimeoutStartSec=0
 ExecStartPre=/usr/bin/docker pull ${DOCKER_IMAGE}
 ExecStartPre=-/usr/bin/docker rm %n
@@ -21,5 +21,5 @@ RestartSec=5
 Restart=always
 
 [X-Fleet]
-MachineMetadata=role=dockerhub
+MachineMetadata=role=registry
 Global=true

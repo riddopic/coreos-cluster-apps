@@ -4,33 +4,33 @@ set -e
 PROG="$(basename "$0")"
 
 printUsage() {
-    echo "Usage: $PROG ENTITY-ID ENDPOINT-URL"
-    echo ""
-    echo "Example:"
-    echo "  $PROG urn:someservice https://sp.example.org/mellon"
-    echo ""
+  echo "Usage: $PROG ENTITY-ID ENDPOINT-URL"
+  echo ""
+  echo "Example:"
+  echo "  $PROG urn:someservice https://sp.example.org/mellon"
+  echo ""
 }
 
 if [ "$#" -lt 2 ]; then
-    printUsage
-    exit 1
+  printUsage
+  exit 1
 fi
 
 ENTITYID="$1"
 if [ -z "$ENTITYID" ]; then
-    echo "$PROG: An entity ID is required." >&2
-    exit 1
+  echo "$PROG: An entity ID is required." >&2
+  exit 1
 fi
 
 BASEURL="$2"
 if [ -z "$BASEURL" ]; then
-    echo "$PROG: The URL to the MellonEndpointPath is required." >&2
-    exit 1
+  echo "$PROG: The URL to the MellonEndpointPath is required." >&2
+  exit 1
 fi
 
 if ! echo "$BASEURL" | grep -q '^https\?://'; then
-    echo "$PROG: The URL must start with \"http://\" or \"https://\"." >&2
-    exit 1
+  echo "$PROG: The URL must start with \"http://\" or \"https://\"." >&2
+  exit 1
 fi
 
 HOST="$(echo "$BASEURL" | sed 's#^[a-z]*://\([^/]*\).*#\1#')"
