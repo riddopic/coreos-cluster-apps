@@ -22,4 +22,4 @@ Restart=always
 
 [X-Fleet]
 MachineOf=fleet-ui.service
-MachineMetadata=role=admiral
+MachineMetadata=role=supervisor

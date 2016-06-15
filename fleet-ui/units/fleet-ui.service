@@ -17,4 +17,4 @@ Restart=always
 
 [X-Fleet]
 X-Conflicts=registry.service
-MachineMetadata=role=admiral
+MachineMetadata=role=supervisor
