@@ -6,9 +6,9 @@
 #
 # Provison on default 'sites'
 # E.g ./deploy.sh reload history
-# 
-# Provision on drush 
-# E.g ./deploy.sh reload history-ssh drush 
+#
+# Provision on drush
+# E.g ./deploy.sh reload history-ssh drush
 #
 # Command arguments
 
@@ -74,18 +74,18 @@ function restart {
 
 # Main
 case $cmd in
-    reload|destroy|restart|start|stop)
-        [[ -z ${service} ]] && echo "service name is required" && exit 1
-        ;;
-    help)
-        echo "deploy.sh reload|destroy|restart|stop|start <service> [role]"
-        exit 0
-        ;;
-       *)
-        echo "Unknown command: $cmd";
-        echo "deploy.sh reload|destroy|restart|stop|start <service> [role]"
-        exit 1
-        ;;
+  reload|destroy|restart|start|stop)
+    [[ -z ${service} ]] && echo "service name is required" && exit 1
+    ;;
+  help)
+    echo "deploy.sh reload|destroy|restart|stop|start <service> [role]"
+    exit 0
+    ;;
+  *)
+    echo "Unknown command: $cmd";
+    echo "deploy.sh reload|destroy|restart|stop|start <service> [role]"
+    exit 1
+    ;;
 esac
 
 
@@ -93,7 +93,7 @@ esac
 sitedir=/var/lib/apps/sites/${service}/units
 [[ ! -d ${sitedir} ]] && sitedir=${PWD}
 
-# If image is given, pull the image first 
+# If image is given, pull the image first
 [[ -n ${image} ]] && docker pull ${image}
 
 # manage SSH units first
@@ -127,7 +127,7 @@ if [[ ${role:-'sites'} = 'sites' ]]; then
       unset old_unit
       unset unit
     done
-  
+
     # clean up any remaining old units
     for u in ${services[*]}; do
       fleetctl destroy ${u}

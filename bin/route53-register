@@ -4,31 +4,30 @@
 # Suport for A (ipv4) record only. Can be easily changed to support other types.
 #
 
-while getopts ":duz:n:" OPTION
-do
-    case $OPTION in
-        d)
-          action="DELETE"
-          ;;
-        u)
-          action="UPSERT"
-          ;;
-        n)
-          node_name=$OPTARG
-          ;;
-        z)
-          zone_name=$OPTARG
-          ;;
-        ?)
-          echo "$0 -d|-u -z <zone> -n <node_name>"
-          exit
-          ;;
-    esac
+while getopts ":duz:n:" OPTION; do
+  case $OPTION in
+    d)
+      action="DELETE"
+      ;;
+    u)
+      action="UPSERT"
+      ;;
+    n)
+      node_name=$OPTARG
+      ;;
+    z)
+      zone_name=$OPTARG
+      ;;
+    ?)
+      echo "$0 -d|-u -z <zone> -n <node_name>"
+      exit
+      ;;
+  esac
 done
-if [ $# -ne 5 ];
-then
- echo "$0 -d|-u -z <zone> -n <node_name>"
- exit 1
+
+if [ $# -ne 5 ]; then
+  echo "$0 -d|-u -z <zone> -n <node_name>"
+  exit 1
 fi
 
 node_name=${node_name/.*/}.${zone_name}
@@ -42,8 +41,7 @@ IMAGE=suet/awscli:latest
 docker history $IMAGE > /dev/null 2>&1 || docker pull $IMAGE
 
 # Address to register
-if [ "X$zone_name" = "Xdocker.local" ];
-then
+if [ "X$zone_name" = "Xdocker.local" ]; then
  address=$(/usr/bin/curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
 else
  address=$(/usr/bin/curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
@@ -56,22 +54,22 @@ hosted_zone_id=$(docker run --rm --env-file=$AWS_CONFIG_ENV $IMAGE /bin/bash -c 
 mkdir -p /var/lib/apps-data/tmp
 cat > /var/lib/apps-data/tmp/$node_name.json <<CHANGESET
 {
-    "Comment": "Update vi $0",
-    "Changes": [
-        {
-            "Action": "${action}",
-            "ResourceRecordSet": {
-                "Name": "${node_name}",
-                "Type": "A",
-                "TTL": 60,
-                "ResourceRecords": [
-                    {
-                        "Value": "${address}"
-                    }
-                ]
-            }
-        }
-    ]
+  "Comment": "Update vi $0",
+  "Changes": [
+    {
+      "Action": "${action}",
+      "ResourceRecordSet": {
+        "Name": "${node_name}",
+        "Type": "A",
+        "TTL": 60,
+        "ResourceRecords": [
+          {
+            "Value": "${address}"
+          }
+        ]
+      }
+    }
+  ]
 }
 CHANGESET
 

@@ -1,7 +1,8 @@
 #!/bin/bash -e
 
-if [ -z $1 ]
-    then echo "Usage: $0 <image_name:tag>"
+if [ -z $1 ]; then
+  echo "Usage: $0 <image_name:tag>"
+  exit 1
 fi
 
 DOCKER_REPO="${DOCKER_REPO:-registry.docker.local}"

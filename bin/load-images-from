@@ -16,7 +16,6 @@ source=$1
 shift
 
 for im in $*; do
-	# load the image only if it's NOT already loaded
 	docker images | awk '{ printf "%s:%s\n", $1,$2 }' | grep $im > /dev/null
 	if [ $? -ne 0 ]; then
 		echo "Load image $im from remote host $source"

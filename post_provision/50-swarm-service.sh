@@ -4,7 +4,7 @@
 
 . /etc/swarm-node.env
 
-cat <<EOF> /etc/systemd/system/docker.service.d/docker.conf;
+cat <<EOF> /etc/systemd/system/docker.service.d/50-insecure-registry.conf;
 [Service]
 Environment=DOCKER_OPTS='-H=0.0.0.0:2376 -H unix:///var/run/docker.sock --insecure-registry=10.0.0.0/8,registry.docker.local --cluster-advertise $(curl -s http://169.254.169.254/latest/meta-data/local-ipv4/):2376 --cluster-store etcd://127.0.0.1:2379'
 EOF

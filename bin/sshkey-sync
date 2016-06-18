@@ -1,7 +1,8 @@
 #!/bin/sh
 
-if [ -z $1 ]
-  then echo "Usage: $0 key"
+if [ -z $1 ]; then
+  echo "Usage: $0 key"
+  exit 1
 fi
 
 KEY=$1
@@ -16,7 +17,7 @@ VOL=/tmp/s3-sshkeys
 accountId=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document \
     | jq --raw-output .accountId)
 
-# Bucket for the file 
+# Bucket for the file
 bucket="${accountId}-coreos-cluster-config"
 
 S3_SSHKEY="s3://${bucket}/keypairs/${KEY}"

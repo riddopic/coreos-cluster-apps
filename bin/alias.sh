@@ -1,14 +1,6 @@
 
-alias cls='cls'
-alias lal="ls -al"
-alias ll='ls -l'
-alias vssh='vagrant ssh'
+alias cls="clear"
 
-alias dk="docker "
-alias dkc="dk ps"
-alias dkm="dk images"
-alias dki="dk inspect"
-alias dkb="dk build"
 alias cleandkc="dkc -a --no-trunc| grep Exit | awk '{print \$1}' | xargs -L 1 -r docker rm"
 alias cleandkm="dkm -a --no-trunc | grep none | awk '{print \$3}' | xargs -L 1 -r docker rmi"
 alias cleandk="cleandkc && cleandkm"
@@ -61,9 +53,3 @@ function sdrit() {
 function nsa {
   sudo nsenter -p -u -m -i -n -t $(docker inspect -f "{{ .State.Pid }}" $1)
 }
-
-alias pj='python -m json.tool'
-
-# AWS alias
-alias syncp="aws s3 --dryrun sync pacific-apps s3://itlab-coreos/apps  --exclude='.git/*' --delete"
-alias synca="aws s3 sync pacific-apps s3://itlab-coreos/apps  --exclude='.git/*' --delete"
