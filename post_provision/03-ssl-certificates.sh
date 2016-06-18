@@ -7,14 +7,14 @@ HOSTNAME=$(curl -s http://169.254.169.254/latest/meta-data/hostname)
 LOCAL_HOSTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname | awk -F "." '{print $1}')
 PUBLIC_HOSTNAME=$(curl -s http://169.254.169.254/latest/meta-data/public-hostname)
 
-mkdir ~/bin
+mkdir /root/bin
 
 curl -SlO https://pkg.cfssl.org/R1.2/SHA256SUMS
 
 curl -sLO https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
 if grep "cfssl_linux-amd64" "SHA256SUMS" | sha256sum -c; then
-  mv cfssl_linux-amd64 ~/bin/cfssl
-  chmod +x ~/bin/cfssl
+  mv cfssl_linux-amd64 /root/bin/cfssl
+  chmod +x /root/bin/cfssl
 else
   echo "The checksum for cfssl did not match!"
   exit 1
@@ -22,8 +22,8 @@ fi
 
 curl -sLO https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
 if grep "cfssljson_linux-amd64" "SHA256SUMS" | sha256sum -c; then
-  mv cfssljson_linux-amd64 ~/bin/cfssljson
-  chmod +x ~/bin/cfssljson
+  mv cfssljson_linux-amd64 /root/bin/cfssljson
+  chmod +x /root/bin/cfssljson
 else
   echo "The checksum for cfssljson did not match!"
   exit 1
@@ -31,8 +31,8 @@ fi
 
 rm -f SHA256SUMS
 
-mkdir ~/cfssl
-cd ~/cfssl
+mkdir /root/cfssl
+cd /root/cfssl
 
 # Generate CA
 cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
@@ -193,20 +193,45 @@ cfssl gencert \
   -config=ca-config.json \
   -profile=client client.json | cfssljson -bare client
 
-cp ~/cfssl/{server.pem,server-key.pem,ca.pem} /etc/docker/
-sudo chown root:root /etc/docker/{server-key.pem,server.pem,ca.pem}
-sudo chmod 0600 /etc/docker/server-key.pem
+cp /root/cfssl/{server.pem,server-key.pem,ca.pem} /etc/docker/
+chmod 0600 /etc/docker/server-key.pem
 
-mkdir ~/.docker
-chmod 700 ~/.docker
-cd ~/.docker
-cp -p ~/cfssl/ca.pem ca.pem
-cp -p ~/cfssl/client.pem cert.pem
-cp -p ~/cfssl/client-key.pem key.pem
+mkdir /root/.docker
+chmod 700 /root/.docker
+cd /root/.docker
+cp /root/cfssl/ca.pem /root/.docker/ca.pem
+cp /root/cfssl/client.pem /root/.docker/cert.pem
+cp /root/cfssl/client-key.pem /root/.docker/key.pem
 
 mkdir /home/core/.docker
 chmod 700 /home/core/.docker
-cp ~/cfssl/ca.pem /home/core/.docker/ca.pem
-cp ~/cfssl/client.pem /home/core/.docker/cert.pem
-cp ~/cfssl/client-key.pem /home/core/.docker/key.pem
+cp /root/cfssl/ca.pem /home/core/.docker/ca.pem
+cp /root/cfssl/client.pem /home/core/.docker/cert.pem
+cp /root/cfssl/client-key.pem /home/core/.docker/key.pem
 chown -R core:core /home/core/.docker
+
+# Make Docker available on a TCP socket on port 2375 for Swarm.
+cat <<EOF> /etc/systemd/system/docker-tls-tcp.socket;
+[Unit]
+Description=Docker Secured Socket for the API
+
+[Socket]
+ListenStream=2376
+BindIPv6Only=both
+Service=docker.service
+
+[Install]
+WantedBy=sockets.target
+EOF
+
+systemctl enable docker-tls-tcp.socket
+systemctl stop docker
+systemctl start docker-tls-tcp.socket
+
+cat <<EOF> etc/systemd/system/docker.service.d/10-tls-verify.conf;
+[Service]
+Environment=DOCKER_OPTS='-H=0.0.0.0:2376 -H unix:///var/run/docker.sock --insecure-registry=10.0.0.0/8,registry.docker.local --bip="172.17.43.1/16" --tlsverify --tlscacert=/etc/docker/ca.pem --tlscert=/etc/docker/server.pem --tlskey=/etc/docker/server-key.pem'
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl restart docker.service
