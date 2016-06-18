@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DOCKER_REPO="${DOCKER_REPO:-registry.coreos-cluster.local}"
+DOCKER_REPO="${DOCKER_REPO:-registry.docker.local}"
 
 str=`curl -s -XGET "http://${DOCKER_REPO}/v1/search?q=$1"`
 IFS=,

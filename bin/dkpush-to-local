@@ -4,7 +4,7 @@ if [ -z $1 ]
     then echo "Usage: $0 <image_name:tag>"
 fi
 
-DOCKER_REPO="${DOCKER_REPO:-registry.coreos-cluster.local}"
+DOCKER_REPO="${DOCKER_REPO:-registry.docker.local}"
 
 id=`docker inspect --format "{{ .Id }}" $1`
 echo docker tag $id "${DOCKER_REPO}/$1"
