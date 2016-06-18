@@ -1,7 +1,7 @@
 #!/bin/sh
 
-if [ -z $1 ]
-    then echo "Usage: $0 site"
+if [ -z $1 ]; then
+  echo "Usage: $0 site"
 fi
 
 SITE=$1
@@ -13,8 +13,8 @@ SITE=$1
 
 account=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq --raw-output .accountId)
 if [[ ! $account ]]; then
-    echo "Error: failed to get the aws account id."
-    exit 4
+  echo "Error: failed to get the aws account id."
+  exit 4
 fi
 
 S3_CERT="s3://${account}-coreos-cluster-config/certs/${SITE}"

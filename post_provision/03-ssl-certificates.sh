@@ -34,6 +34,9 @@ rm -f SHA256SUMS
 mkdir ~/cfssl
 cd ~/cfssl
 
+# Generate CA
+cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
+
 cat <<EOF > ca-config.json;
 {
   "signing": {
@@ -89,9 +92,6 @@ cat <<EOF > ca-csr.json;
   ]
 }
 EOF
-
-# Generate CA
-cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
 
 # Generate server certificate
 #

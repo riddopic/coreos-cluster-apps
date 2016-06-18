@@ -1,3 +1,5 @@
+
+alias cls='cls'
 alias lal="ls -al"
 alias ll='ls -l'
 alias vssh='vagrant ssh'
@@ -36,12 +38,29 @@ alias flm="f list-machines"
 alias flu="f list-units"
 alias fsh="f ssh"
 
-function dkip() { docker inspect --format "{{ .NetworkSettings.IPAddress }}" $1 ; }
-function dkid() { docker inspect --format "{{ .ID }}" $1 ; }
-function dkim() { docker inspect --format "{{ .Image }}" $1 ; }
-function dkst() { docker inspect --format "{{ .State.Running }}" $1 ; }
-function sdrit() { sudo docker run -i -t $1 bash ; }
-function nsa { sudo nsenter -p -u -m -i -n -t $(docker inspect -f "{{ .State.Pid }}" $1) ; }
+function dkip() {
+  docker inspect --format "{{ .NetworkSettings.IPAddress }}" $1
+}
+
+function dkid() {
+  docker inspect --format "{{ .ID }}" $1
+}
+
+function dkim() {
+  docker inspect --format "{{ .Image }}" $1
+}
+
+function dkst() {
+  docker inspect --format "{{ .State.Running }}" $1
+}
+
+function sdrit() {
+  sudo docker run -i -t $1 bash
+}
+
+function nsa {
+  sudo nsenter -p -u -m -i -n -t $(docker inspect -f "{{ .State.Pid }}" $1)
+}
 
 alias pj='python -m json.tool'
 
