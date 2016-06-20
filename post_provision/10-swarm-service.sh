@@ -4,6 +4,11 @@
 
 . /etc/swarm-node.env
 
+IP_1=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4/)
+IP_2=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4/)
+DNS_1=$(curl -s http://169.254.169.254/latest/meta-data/hostname)
+DNS_2=$(curl -s http://169.254.169.254/latest/meta-data/hostname | awk -F "." '{print $1}')
+
 mkdir -p /home/core/.docker
 
 cd /var/lib/apps/post_provision
@@ -12,12 +17,12 @@ cp files/ssl/ca.pem /home/core/.docker/
 cp files/ssl/cert.pem /home/core/.docker/
 cp files/ssl/key.pem /home/core/.docker/
 
-echo 'subjectAltName = @alt_names' >> files/ssl/openssl.cnf
-echo '[alt_names]' >> files/ssl/openssl.cnf
-echo 'IP.1 = $(curl -s http://169.254.169.254/latest/meta-data/local-ipv4/)' >> files/ssl/openssl.cnf
-echo 'IP.2 = $(curl -s http://169.254.169.254/latest/meta-data/public-ipv4/)' >> files/ssl/openssl.cnf
-echo 'DNS.1 = $(curl -s http://169.254.169.254/latest/meta-data/hostname)' >> files/ssl/openssl.cnf
-echo 'DNS.2 = $(curl -s http://169.254.169.254/latest/meta-data/hostname | awk -F "." '{print $1}').xip.io' >> files/ssl/openssl.cnf
+echo "subjectAltName = @alt_names" >> files/ssl/openssl.cnf
+echo "[alt_names]" >> files/ssl/openssl.cnf
+echo "IP.1 = ${IP_1}" >> files/ssl/openssl.cnf
+echo "IP.2 = ${IP_2}" >> files/ssl/openssl.cnf
+echo "DNS.1 = ${DNS_1}" >> files/ssl/openssl.cnf
+echo "DNS.2 = ${DNS_2}.xip.io" >> files/ssl/openssl.cnf
 
 openssl req -new \
   -key files/ssl/key.pem \
