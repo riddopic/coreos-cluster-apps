@@ -14,10 +14,10 @@ cp files/ssl/key.pem /home/core/.docker/
 
 echo 'subjectAltName = @alt_names' >> files/ssl/openssl.cnf
 echo '[alt_names]' >> files/ssl/openssl.cnf
-echo 'IP.1 = ${self.network.0.fixed_ip_v4}' >> files/ssl/openssl.cnf
-echo 'IP.2 = ${element(openstack_networking_floatingip_v2.coreos.*.address, count.index)}' >> files/ssl/openssl.cnf
-echo 'DNS.1 = ${var.fqdn}' >> files/ssl/openssl.cnf
-echo 'DNS.2 = ${element(openstack_networking_floatingip_v2.coreos.*.address, count.index)}.xip.io' >> files/ssl/openssl.cnf
+echo 'IP.1 = $(curl -s http://169.254.169.254/latest/meta-data/local-ipv4/)' >> files/ssl/openssl.cnf
+echo 'IP.2 = $(curl -s http://169.254.169.254/latest/meta-data/public-ipv4/)' >> files/ssl/openssl.cnf
+echo 'DNS.1 = $(curl -s http://169.254.169.254/latest/meta-data/hostname)' >> files/ssl/openssl.cnf
+echo 'DNS.2 = $(curl -s http://169.254.169.254/latest/meta-data/hostname | awk -F "." '{print $1}').xip.io' >> files/ssl/openssl.cnf
 
 openssl req -new \
   -key files/ssl/key.pem \
